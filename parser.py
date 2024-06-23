@@ -5,6 +5,23 @@ ns = {'alto':'http://www.loc.gov/standards/alto/ns-v4#'}
 in_file_name = 'btv1b52500967c_f78.xml'
 out_file_name = 'out.ttl'
 out_file = open(out_file_name, 'w', encoding = 'utf-8')
+out_file.write(f'''@prefix : <http://cophilab.eu/ontologies/cophi/> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix lrm: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix ontolex: <http://www.w3.org/ns/lemon/ontolex#> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@base <http://cophilab.eu/ontologies/cophi/> .
+
+<http://cophilab.eu/ontologies/cophi> a owl:Ontology .
+
+
+''')
 tree = etree.parse(in_file_name)
 zone_dic = {}
 for otherTag in tree.findall('.//alto:Tags/alto:OtherTag', namespaces=ns):
