@@ -1,0 +1,371 @@
+@prefix : <http://cophilab.eu/ontologies/cophi/> .
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix lrm: <http://iflastandards.info/ns/lrm/lrmoo/> .
+@prefix ontolex: <http://www.w3.org/ns/lemon/ontolex#> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@base <http://cophilab.eu/ontologies/cophi/> .
+
+<http://cophilab.eu/ontologies/cophi> a owl:Ontology .
+
+#################################################################
+#    Classes
+#################################################################
+
+:Physical_Human-Made_Object a owl:Class ; rdfs:subClassOf crm:E22_Human-Made_Object .
+:Digital_Human-Made_Object a owl:Class ; rdfs:subClassOf crm:E22_Human-Made_Object .
+
+:Physical_Human-Made_Feature a owl:Class ; rdfs:subClassOf crm:E25_Human-Made_Feature .
+:Digital_Human-Made_Feature a owl:Class ; rdfs:subClassOf crm:E25_Human-Made_Feature .
+
+:PhysicalTextBearingObject rdfs:subClassOf :Physical_Human-Made_Object .
+:PhysicalManuscript rdfs:subClassOf :PhysicalTextBearingObject .
+:PhysicalCodex rdfs:subClassOf :PhysicalManuscript ;
+	       rdfs:subClassOf [
+                	       a owl:Restriction ;
+           		       owl:onProperty crm:P46_is_composed_of ;
+           		       owl:allValuesFrom :PhysicalFolio
+       		] .
+:PhysicalFolio rdfs:subClassOf :Physical_Human-Made_Object ;
+	       rdfs:subClassOf [
+                	       a owl:Restriction ;
+           		       owl:onProperty crm:P56_bears_feature ;
+           		       owl:allValuesFrom :PhysicalPageSide
+               ] .	       
+:PhysicalPageSide rdfs:subClassOf :Physical_Human-Made_Feature .
+
+:Facsimile rdfs:subClassOf :Digital_Human-Made_Object .
+:CodexFacsimile rdfs:subClassOf :Facsimile ;
+	       rdfs:subClassOf [
+                	       a owl:Restriction ;
+           		       owl:onProperty crm:P46_is_composed_of ;
+           		       owl:allValuesFrom :LayoutFacsimile
+               ] .
+:LayoutFacsimile rdfs:subClassOf :Facsimile .	       
+
+:DiplomaticEdition rdfs:subClassOf :Digital_Human-Made_Object .
+
+:Codex a owl:Class ;
+      rdfs:subClassOf :DiplomaticEdition ;
+      rdfs:subClassOf [ a owl:Restriction ;
+                                            owl:onProperty crm:P46_is_composed_of ;
+                                            owl:allValuesFrom :Layout
+                                          ] .
+
+:Layout a owl:Class ;
+      rdfs:subClassOf :DiplomaticEdition ;
+      rdfs:subClassOf [ a owl:Restriction ;
+                                            owl:onProperty crm:P56_bears_feature ;
+                                            owl:allValuesFrom :Page
+                                          ] .
+
+:Page a owl:Class ;
+      rdfs:subClassOf :Digital_Human-Made_Feature ;
+      rdfs:subClassOf [ a owl:Restriction ;
+                                            owl:onProperty crm:P56_bears_feature ;
+                                            owl:allValuesFrom :Zone
+                                          ] .
+
+:Zone a owl:Class ;
+      rdfs:subClassOf :Digital_Human-Made_Feature ;
+      rdfs:subClassOf [ a owl:Restriction ;
+                                            owl:onProperty crm:P56_bears_feature ;
+                                            owl:allValuesFrom :Line
+                                          ] .
+
+:Line a owl:Class ;
+      rdfs:subClassOf :Digital_Human-Made_Feature ;
+      rdfs:subClassOf [ a owl:Restriction ;
+                                            owl:onProperty crm:P56_bears_feature ;
+                                            owl:allValuesFrom :Segment
+                                          ] .
+
+
+:Segment a owl:Class ;
+	 rdfs:subClassOf :Digital_Human-Made_Feature ;
+	 rdfs:subClassOf [ a owl:Restriction ;
+	 		                   owl:onProperty crm:P128_carries ;
+					   owl:allValuesFrom :CharacterSequence
+					  ] ;
+	 rdfs:subClassOf [ a owl:Restriction ;
+                                            owl:onProperty crm:P56_bears_feature ;
+                                            owl:allValuesFrom :Glyph
+                                          ] .
+
+:Glyph a owl:Class ;
+       rdfs:subClassOf :Digital_Human-Made_Feature .
+       
+:Shape a owl:Class ; rdfs:subClassOf :Digital_Human-Made_Feature ;
+    rdfs:label "Shape" ;
+    rdfs:comment "A shape associated with a text block, containing one or more polygons." .
+
+:Polygon a owl:Class ; rdfs:subClassOf :Digital_Human-Made_Feature ;
+    rdfs:label "Polygon" ;
+    rdfs:comment "A polygon defined by a series of points." .
+
+:Baseline a owl:Class ; rdfs:subClassOf :Digital_Human-Made_Feature ;
+   rdfs:label "Polygon" ;
+   rdfs:comment "The baseline of a text line" .
+
+:CharacterSequence a owl:Class ; rdfs:subClassOf crm:E90_Symbolic_Object ;
+		   rdfs:subClassOf [ a owl:Restriction ;
+		   		   owl:onProperty rdf:value ;
+				   owl:allValuesFrom rdfs:Literal
+		                ] .
+
+:TextualObject a owl:Class ;
+		rdfs:subClassOf crm:E33_Linguistic_Object .
+
+:Division a owl:Class ;
+	  rdfs:subClassOf :TextualObject ;
+	  rdfs:subClassOf lrm:F2_Expression ;
+	  rdfs:subClassOf [ a owl:Restriction ;
+	  		  owl:onProperty :has_division_type ;
+			  owl:allValuesFrom :DivisionType
+			] ;
+	  rdfs:subClassOf [ a owl:Restriction ;
+	  		  owl:onProperty :P46_is_composed_of ;
+			  owl:allValuesFrom [ a owl:Class ;
+			  		    owl:unionOf (:Division :Token)
+					 ]
+		         ] .
+
+:Token a owl:Class ;
+       rdfs:subClassOf :CharacterSequence ;
+       rdfs:subClassOf :TextualObject ;
+       rdfs:subClassOf lrm:F2_Expression ;
+       rdfs:subClassOf ontolex:Form ;
+       rdfs:subClassOf [ a owl:Restriction ;
+       		       owl:onProperty :has_token_part ;
+		       owl:allValuesFrom :Token
+		     ] ;
+       rdfs:subClassOf [ a owl:Restriction ;
+       		       owl:onProperty :has_token_type ;
+		       owl:allValuesFrom :TokenType
+		    ] .
+
+:CTSURN a owl:Class ;
+	rdfs:subClassOf crm:E90_Symbolic_Object .
+
+:ZoneType a owl:Class ;
+	  rdfs:subClassOf crm:E55_Type .
+
+:LineType a owl:Class ;
+	  rdfs:subClassOf crm:E55_Type .
+
+:SegmentType a owl:Class ;
+	     rdfs:subClassOf crm:E55_Type .
+
+:DivisionType a owl:Class ;
+	    rdfs:subClassOf crm:E55_Type .
+
+:TokenType a owl:Class ;
+	   rdfs:subClassOf crm:E55_Type .
+	   
+
+### Properties ###
+
+:has_zone_type a owl:ObjectProperty ;
+         rdfs:domain :Zone ;
+         rdfs:range :ZoneType ;
+         rdfs:label "has zone type" ;
+	 rdfs:subPropertyOf crm:P2_has_type ;
+         rdfs:comment "Relates a Zone to its ZoneType." .
+
+:has_line_type  a owl:ObjectProperty ;
+        rdfs:domain :Line ;
+        rdfs:range :LineType ;
+        rdfs:label "has line type" ;
+        rdfs:subPropertyOf crm:P2_has_type ;
+        rdfs:comment "Relates a Line to its LineType." .
+
+:has_segment_type  a owl:ObjectProperty ;
+         rdfs:domain :Segment ;
+         rdfs:range :SegmentType ;
+         rdfs:label "has segment type" ;
+	 rdfs:subPropertyOf crm:P2_has_type ;
+         rdfs:comment "Relates a Segment to its SegmentType." .
+
+:has_division_type a owl:ObjectProperty ;
+         rdfs:domain :Division ;
+	 rdfs:range :DivisionType ;
+	 rdfs:label "has division type" ;
+	 rdfs:subPropertyOf crm:P2_has_type ;
+	 rdfs:comment "Relates a Division to its DivisionType." .
+
+#:has_height a owl:ObjectProperty ;
+#         rdfs:domain crm:E18_Physical_Thing ;
+#         rdfs:range :Height ;
+#         rdfs:label "has height" ;
+#	 rdfs:subPropertyOf crm:P43_has_dimension ;
+#         rdfs:comment "Relates a Thing to its Height." .
+
+#:has_width a owl:ObjectProperty ;
+#         rdfs:domain crm:E18_Physical_Thing ;
+#         rdfs:range :Width ;
+#         rdfs:label "has width" ;
+#	 rdfs:subPropertyOf crm:P43_has_dimension ;
+#         rdfs:comment "Relates a Thing to its Width." .
+
+#:has_vertical_position a owl:ObjectProperty ;
+#         rdfs:domain crm:E18_Physical_Thing ;
+#         rdfs:range :VerticalPosition ;
+#         rdfs:label "has vertical position" ;
+#         rdfs:comment "Relates a Thing to its VerticalPosition." .
+
+#:has_horizontal_position a owl:ObjectProperty ;
+#         rdfs:domain crm:E18_Physical_Thing ;
+#         rdfs:range :HorizontalPosition ;
+#         rdfs:label "has horizontal position" ;
+#         rdfs:comment "Relates a Thing to its HorizontalPosition." .
+
+:hpos a rdf:Property ;
+      rdfs:domain crm:E18_Physical_Thing ;
+      rdfs:range xsd:integer .
+
+:vpos a rdf:Property ;
+      rdfs:domain crm:E18_Physical_Thing ;
+      rdfs:range xsd:integer .
+
+:width a rdf:Property ;
+       rdfs:domain crm:E18_Physical_Thing ;
+       rdfs:range xsd:integer .
+
+:height a rdf:Property ;
+        rdfs:domain crm:E18_Physical_Thing ;
+        rdfs:range xsd:integer .
+
+
+:has_shape a owl:ObjectProperty ;
+	  rdfs:domain crm:E18_Physical_Thing ;
+	  rdfs:range :Shape ;
+	  rdfs:label "has shape";
+	  rdfs:comment "Relates a Thing to its Shape." .
+
+:has_polygon a owl:ObjectProperty ;
+	  rdfs:domain :Shape ;
+	  rdfs:range :Polygon ;
+	  rdfs:label "has polygon" ;
+	  rdfs:comment "Relates a Shape to its Polygon." .
+
+:has_baseline a owl:ObjectProperty ;
+	 rdfs:domain :Line ;
+	 rdfs:range :Baseline ;
+	 rdfs:label "has baseline" ;
+	 rdfs:comment "Relates a Line to its Baseline." .
+
+:has_token_part a owl:ObjectProperty ;
+	  rdfs:domain :Token ;
+	  rdfs:range :Token ;
+	  rdfs:label "has token part" ;
+	  rdfs:comment "Relates a Token to its Token part." .
+
+:has_token_type a owl:ObjectProperty ;
+	  rdfs:domain :Token ;
+	  rdfs:range :TokenType ;
+	  rdfs:label "has token type" ;
+	  rdfs:comment "Relates a Token to its TokenType." .
+
+:has_textual_position a owl:ObjectProperty ;
+          rdfs:domain :TextualObject ;
+	  rdfs:range rdfs:Literal .
+
+:has_cts_urn a owl:ObjectProperty ;
+	 rdfs:domain :TextualObject ;
+	 rdfs:range :CTSURN .
+
+geo:as_polygon a owl:DatatypeProperty ;
+	   rdfs:domain :Polygon ;
+	   rdfs:range geo:wktLiteral ;
+	   rdfs:label "as polygon" ;
+	   rdfs:comment "Defines the polygon geometry in WKT format." .
+
+geo:as_linestring a owl:DatatypeProperty ;
+	   rdfs:domain :Baseline ;
+	   rdfs:range geo:wktLiteral ;
+	   rdfs:label "as linestring" ;
+	   rdfs:comment "Defines the baseline (=linestring) geometry in WKT format." .
+
+
+### Individuals ###
+:CustomZone a :ZoneType .
+:DamageZone a :ZoneType .
+:DigitizationArtefactZone a :ZoneType .
+:DropCapitalZone a :ZoneType .
+:GraphicZone a :ZoneType .
+:MainZone a :ZoneType .
+:MarginTextZone a :ZoneType .
+:MusicZone a :ZoneType .
+:NumberingZone a :ZoneType .
+:QuireMarksZone a :ZoneType .
+:RunningTitleZone a :ZoneType .
+:SealZone a :ZoneType .
+:StampZone a :ZoneType .
+:TableZone a :ZoneType .
+:TitlePageZone a :ZoneType .
+
+:DefaultLine a :LineType .
+:DropCapitalLine a :LineType .
+:HeadingLine a :LineType .
+:InterlinearLine a :LineType .
+
+:TextualSegment a :SegmentType .
+:SpaceSegment a :SegmentType .
+
+:Sentence a :DivisionType .
+:Paragraph a :DivisionType .
+:Div1 a :DivisionType .
+:Div2 a :DivisionType .
+:Div3 a :DivisionType .
+:Div4 a :DivisionType .
+:Div5 a :DivisionType .
+:Div6 a :DivisionType .
+:PoemLine a :DivisionType .
+:PoemLineGroup a :DivisionType .
+
+:TokenWhole a :TokenType .
+:TokenPart a :TokenType .
+
+
+:Citation a owl:Class ; rdfs:subClassOf crm:E90_Symbolic_Object .
+:Interval a owl:Class ; rdfs:subClassOf crm:E90_Symbolic_Object .
+
+:first_cts_urn a owl:ObjectProperty ;
+           rdfs:domain :Interval ;
+           rdfs:range :CTSURN .
+
+:last_cts_urn a owl:ObjectProperty ;
+          rdfs:domain :Interval ;
+          rdfs:range :CTSURN .
+
+:has_intervals a owl:ObjectProperty ;
+    rdfs:domain :Citation ;rdfs:range [
+    a owl:Class ;
+    owl:intersectionOf (
+        rdf:List
+        [
+            a owl:Restriction ;
+            owl:onProperty rdf:first ;
+            owl:allValuesFrom :Interval
+        ]
+        [
+            a owl:Restriction ;
+            owl:onProperty rdf:rest ;
+            owl:allValuesFrom [
+                a owl:Class ;
+                owl:unionOf (
+                    rdf:List
+                    owl:Nothing
+                )
+            ]
+        ]
+     )
+    ] .
+
+##### *****************************************
+
