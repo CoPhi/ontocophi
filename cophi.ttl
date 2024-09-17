@@ -1,5 +1,7 @@
 @prefix : <http://cophilab.eu/ontologies/cophi/> .
 @prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmtex: <http://www.cidoc-crm.org/extensions/crmtex/> .
+@prefix ceo: <http://purl.org/critical-edition-ontology/> .
 @prefix lrm: <http://iflastandards.info/ns/lrm/lrmoo/> .
 @prefix ontolex: <http://www.w3.org/ns/lemon/ontolex#> .
 @prefix geo: <http://www.opengis.net/ont/geosparql#> .
@@ -68,6 +70,13 @@
       rdfs:subClassOf :Digital_Human-Made_Feature ;
       rdfs:subClassOf [ a owl:Restriction ;
                                             owl:onProperty crm:P56_bears_feature ;
+                                            owl:allValuesFrom :WrittenSpace
+                                          ] .
+
+:WrittenSpace a owl:Class ;
+      rdfs:subClassOf :Digital_Human-Made_Feature ;
+      rdfs:subClassOf [ a owl:Restriction ;
+                                            owl:onProperty crm:P56_bears_feature ;
                                             owl:allValuesFrom :Zone
                                           ] .
 
@@ -109,7 +118,7 @@
     rdfs:comment "A polygon defined by a series of points." .
 
 :Baseline a owl:Class ; rdfs:subClassOf :Digital_Human-Made_Feature ;
-   rdfs:label "Polygon" ;
+   rdfs:label "Baseline" ;
    rdfs:comment "The baseline of a text line" .
 
 :CharacterSequence a owl:Class ; rdfs:subClassOf crm:E90_Symbolic_Object ;
@@ -129,7 +138,7 @@
 			  owl:allValuesFrom :DivisionType
 			] ;
 	  rdfs:subClassOf [ a owl:Restriction ;
-	  		  owl:onProperty :P46_is_composed_of ;
+	  		  owl:onProperty crm:P46_is_composed_of ;
 			  owl:allValuesFrom [ a owl:Class ;
 			  		    owl:unionOf (:Division :Token)
 					 ]
@@ -138,8 +147,6 @@
 :Token a owl:Class ;
        rdfs:subClassOf :CharacterSequence ;
        rdfs:subClassOf :TextualObject ;
-       rdfs:subClassOf lrm:F2_Expression ;
-       rdfs:subClassOf ontolex:Form ;
        rdfs:subClassOf [ a owl:Restriction ;
        		       owl:onProperty :has_token_part ;
 		       owl:allValuesFrom :Token
@@ -149,8 +156,16 @@
 		       owl:allValuesFrom :TokenType
 		    ] .
 
+:ExpressionToken a owl:Class ;
+       rdfs:subClassOf :Token ;
+       rdfs:subClassOf lrm:F2_Expression ;
+       rdfs:subClassOf ontolex:Form .
+
 :CTSURN a owl:Class ;
 	rdfs:subClassOf crm:E90_Symbolic_Object .
+
+:WrittenSpaceType a owl:Class ;
+          rdfs:subClassOf crm:E55_Type .
 
 :ZoneType a owl:Class ;
 	  rdfs:subClassOf crm:E55_Type .
@@ -169,6 +184,13 @@
 	   
 
 ### Properties ###
+
+:has_written_space_type a owl:ObjectProperty ;
+         rdfs:domain :WrittenSpace ;
+         rdfs:range :WrittenSpaceType ;
+         rdfs:label "has written space type" ;
+	 rdfs:subPropertyOf crm:P2_has_type ;
+         rdfs:comment "Relates a WrittenSpace to its WrittenSpaceType." .
 
 :has_zone_type a owl:ObjectProperty ;
          rdfs:domain :Zone ;
@@ -198,51 +220,25 @@
 	 rdfs:subPropertyOf crm:P2_has_type ;
 	 rdfs:comment "Relates a Division to its DivisionType." .
 
-#:has_height a owl:ObjectProperty ;
-#         rdfs:domain crm:E18_Physical_Thing ;
-#         rdfs:range :Height ;
-#         rdfs:label "has height" ;
-#	 rdfs:subPropertyOf crm:P43_has_dimension ;
-#         rdfs:comment "Relates a Thing to its Height." .
-
-#:has_width a owl:ObjectProperty ;
-#         rdfs:domain crm:E18_Physical_Thing ;
-#         rdfs:range :Width ;
-#         rdfs:label "has width" ;
-#	 rdfs:subPropertyOf crm:P43_has_dimension ;
-#         rdfs:comment "Relates a Thing to its Width." .
-
-#:has_vertical_position a owl:ObjectProperty ;
-#         rdfs:domain crm:E18_Physical_Thing ;
-#         rdfs:range :VerticalPosition ;
-#         rdfs:label "has vertical position" ;
-#         rdfs:comment "Relates a Thing to its VerticalPosition." .
-
-#:has_horizontal_position a owl:ObjectProperty ;
-#         rdfs:domain crm:E18_Physical_Thing ;
-#         rdfs:range :HorizontalPosition ;
-#         rdfs:label "has horizontal position" ;
-#         rdfs:comment "Relates a Thing to its HorizontalPosition." .
-
 :hpos a rdf:Property ;
-      rdfs:domain crm:E18_Physical_Thing ;
+      rdfs:domain crm:E24_Physical_Human-Made_Thing ;
       rdfs:range xsd:integer .
 
 :vpos a rdf:Property ;
-      rdfs:domain crm:E18_Physical_Thing ;
+      rdfs:domain crm:E24_Physical_Human-Made_Thing ;
       rdfs:range xsd:integer .
 
 :width a rdf:Property ;
-       rdfs:domain crm:E18_Physical_Thing ;
+       rdfs:domain crm:E24_Physical_Human-Made_Thing ;
        rdfs:range xsd:integer .
 
 :height a rdf:Property ;
-        rdfs:domain crm:E18_Physical_Thing ;
+        rdfs:domain crm:E24_Physical_Human-Made_Thing ;
         rdfs:range xsd:integer .
 
 
 :has_shape a owl:ObjectProperty ;
-	  rdfs:domain crm:E18_Physical_Thing ;
+	  rdfs:domain crm:E24_Physical_Human-Made_Thing ;
 	  rdfs:range :Shape ;
 	  rdfs:label "has shape";
 	  rdfs:comment "Relates a Thing to its Shape." .
@@ -293,6 +289,9 @@ geo:as_linestring a owl:DatatypeProperty ;
 
 
 ### Individuals ###
+
+:WrittenSpace a :WrittenSpaceType .
+
 :CustomZone a :ZoneType .
 :DamageZone a :ZoneType .
 :DigitizationArtefactZone a :ZoneType .
@@ -328,30 +327,26 @@ geo:as_linestring a owl:DatatypeProperty ;
 :PoemLine a :DivisionType .
 :PoemLineGroup a :DivisionType .
 
-:TokenWhole a :TokenType .
-:TokenPart a :TokenType .
-
-
 :Citation a owl:Class ; rdfs:subClassOf crm:E90_Symbolic_Object .
-:Interval a owl:Class ; rdfs:subClassOf crm:E90_Symbolic_Object .
+:TextPassage a owl:Class ; rdfs:subClassOf crm:E90_Symbolic_Object .
 
 :first_cts_urn a owl:ObjectProperty ;
-           rdfs:domain :Interval ;
+           rdfs:domain :TextPassage ;
            rdfs:range :CTSURN .
 
 :last_cts_urn a owl:ObjectProperty ;
-          rdfs:domain :Interval ;
+          rdfs:domain :TextPassage ;
           rdfs:range :CTSURN .
 
-:has_intervals a owl:ObjectProperty ;
-    rdfs:domain :Citation ;rdfs:range [
+:has_text_passages a owl:ObjectProperty ;
+    rdfs:domain :Citation ; rdfs:range [
     a owl:Class ;
     owl:intersectionOf (
         rdf:List
         [
             a owl:Restriction ;
             owl:onProperty rdf:first ;
-            owl:allValuesFrom :Interval
+            owl:allValuesFrom :TextPassage
         ]
         [
             a owl:Restriction ;
